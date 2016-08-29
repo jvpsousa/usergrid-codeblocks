@@ -1,0 +1,23 @@
+{
+  "name": "usergrid-codeblocks",
+  "version": "0.0.1",
+  "description": "",
+  "main": "usergrid-codeblocks.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jvpsousa/usergrid-codeblocks.git"
+  },
+  "author": "João Vitor <jvpsousa@gmail.com>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jvpsousa/usergrid-codeblocks/issues"
+  },
+  "homepage": "https://github.com/jvpsousa/usergrid-codeblocks#readme",
+  "dependencies": {
+    "request": "^2.74.0",
+    "restify": "^4.1.1",
+  }
+}
