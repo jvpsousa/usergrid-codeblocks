@@ -14,6 +14,12 @@ server
 
 var routes = {};
 
+var usergridConfig = {};
+
+function _init(config) {
+		usergridConfig = config;
+}
+
 
 function _route(route, method, authRequired, requiredRole, callback) {
 
@@ -24,50 +30,48 @@ function _route(route, method, authRequired, requiredRole, callback) {
 	};
 
 	var routeFilter = function(req, res, next) {
-		
-		var requestRoute = traitUrl(req.url);
 
-		
+		var requestRoute = traitUrl(req.url);
 
 		if(routes[requestRoute].authRequired) {
 
-			var baseUrl = req.body.usergridConfig.baseUrl+'/'+req.body.usergridConfig.orgId+'/'+req.body.usergridConfig.appId;
+			var baseUrl = usergridConfig.baseUrl+'/'+usergridConfig.orgId+'/'+usergridConfig.appId;
 			console.log('baseURL: '+baseUrl);
 
 			request({
 				method: 'GET',
 				uri: baseUrl+'/users/me',
 				headers: {
-					'Authorization': 'Bearer '+ req.body.usergridConfig.token
+					'Authorization': 'Bearer '+ req.body.usergridToken
 				}
 			}, function(error, response, body) {
 
 				body = JSON.parse(body);
 
 				if(error || body.error) {
-				
+
 					res.contentType = 'json';
 					res.send(403, {error: 'You must be logged in to access this route !'});
 					res.end();
-				
+
 				} else {
 
 					if(routes[requestRoute].requiredRole != null) {
-						
+
 						var rolesUrl = baseUrl+body.entities[0].metadata.sets.rolenames;
 
 						request({
 							method: 'GET',
 							uri: rolesUrl,
 							headers: {
-								'Authorization': 'Bearer '+ req.body.usergridConfig.token
-							} 
+								'Authorization': 'Bearer '+ req.body.usergridToken
+							}
 						}, function(error, response, body) {
 
 							body = JSON.parse(body);
-							
+
 							if(error || body.error) {
-								
+
 								res.contentType = 'json';
 								res.send(500, {error: 'Ops, something wrong !'});
 								res.end();
@@ -81,7 +85,7 @@ function _route(route, method, authRequired, requiredRole, callback) {
 									res.contentType = 'json';
 									res.send(403, {error: 'You have no permission to access this route !'});
 									res.end();
-								
+
 								}
 							}
 
@@ -91,11 +95,11 @@ function _route(route, method, authRequired, requiredRole, callback) {
 				}
 
 			});
-			
+
 		}
 	}
 
-	if(method == 'POST') server.post(route, routeFilter);
+	if(method == 'POST') server.post(route, callback);
 
 }
 
@@ -109,6 +113,7 @@ function traitUrl(url) {
 }
 
 var usergridCodeblocks = {
+	init: _init,
 	route:  _route,
 	run: _run
 }
